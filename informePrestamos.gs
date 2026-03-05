@@ -154,6 +154,17 @@ function generarInformeConMonto() {
       attachments: [blob]
     });
 
+    // ✅ NUEVO: Actualizar estado a "Enviado" en BD_PRESTAMOS para todas las filas procesadas
+    const idsEnviados = new Set(pendientes.map(r => String(r[0]))); // Columna A = ID
+
+    for (let i = 1; i < data.length; i++) { // i=1 para saltar la cabecera
+      if (idsEnviados.has(String(data[i][0]))) {
+        sheetOrigen.getRange(i + 1, COL_ESTADO + 1).setValue("Enviado"); // +1 porque Sheets es base 1
+      }
+    }
+
+    SpreadsheetApp.flush(); // Confirmar escritura en la hoja
+
     // Limpieza
     DriveApp.getFileById(idTemp).setTrashed(true);
 
